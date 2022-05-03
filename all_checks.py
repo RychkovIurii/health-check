@@ -4,6 +4,7 @@ import os
 import shutil
 import sys
 
+
 def check_reboot():
     """Returns True if computer has a pending reboot"""
     return os.path.exists("/run/reboot-require")
@@ -23,35 +24,18 @@ def check_root_full():
     """Returns True if the root partition is full, False otherwise"""
     return check_disk_full(disk="/", min_gb=2, min_percent=10)
 
-def check_no_network_connection():
-    """Returns True if it fails to resolve Google's URL, False otherwise"""
-    try:
-        socker.gethostbyname("www.google.com")
-        return False
-    except:
-        return True
-
-def check_cpu_constrained():
-    """Returns True if the CPU is having too much usage, False otherwise."""
-    return psutil.cpu_percent(1) > 75
 
 def main():
     checks = [(check_reboot, 'Pending Reboot.'),
-              (check_root_full, 'Root partition full.'),
-              (check_no_network_connection(), 'No working network connection')]
-
-    everything_ok = True
-
-    for ck, msg in checks:
-        if ck():
+              (check_root_full, 'Root partition full.')
+    ]
+    for check, msg in checks:
+        if check():
             print(msg)
-            everything_ok = False
-
-    if not everything_ok:
-        sys.exit(1)
+            sys.exit(1)
 
     print("Everything ok.")
     sys.exit(0)
 
-if __name__ == '__main__':
-    main()
+
+main()
